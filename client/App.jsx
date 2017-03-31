@@ -24,7 +24,7 @@ export default class App extends Component {
 					zDepth={2}
 					style={{padding: '40px'}}
 				>
-					<Helmet title='Xibo Feed manager' />
+					<Helmet title='Feed manager' />
 					{this.props.children}
 				</Paper>
 			</MuiThemeProvider>

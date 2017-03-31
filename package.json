@@ -1,5 +1,5 @@
 {
-  "name": "xibo-feed",
+  "name": "mun-ticker",
   "private": true,
   "scripts": {
     "start": "meteor run"

@@ -7,7 +7,7 @@ import FeedItems from '/api/feedItems.js';
 
 Meteor.startup(() => {
 	RssFeed.publish('feed', function(query) {
-		this.setValue('title', 'Xibo feed');
+		this.setValue('title', 'MUN Feed');
 		this.setValue('description', this.cdata('This is a live feed'));
 		this.setValue('link', Meteor.absoluteUrl());
 		this.setValue('lastBuildDate', new Date());
