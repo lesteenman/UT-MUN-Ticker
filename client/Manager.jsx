@@ -24,24 +24,31 @@ import FeedItems from '/api/feedItems.js';
 const itemButtonStyle = {
 	margin: '0 8px',
 };
-const FeedItem = SortableElement((props) => {
-	console.log('FeedItem', props);
+const FeedItem = SortableElement(({_id, text, enabled}) => {
 	return (
 	<ListItem
 		leftCheckbox={<Checkbox
-			defaultChecked={props.enabled}
+			defaultChecked={enabled}
 			onCheck={(e,c) => {
 				console.log("Toggling checkbox:", e, e.target, c);
-				Meteor.call('feed.setEnabled', props._id, c);
+				Meteor.call('feed.setEnabled', _id, c);
 			}}
 		/>}
 	>
 		<div style={{display: 'flex', flexDirection: 'row'}}>
-			<span style={{flex: 1}}>{props.text}</span>
+			<TextField
+				id={_id}
+				style={{flex: 1, marginTop: '-17px'}}
+				onChange={(e) => {
+					console.log("Field changed:", _id, e.target.value);
+					Meteor.call('feed.edit', _id, e.target.value);
+				}}
+				defaultValue={text}
+			/>
 			<ArrowDownIcon
 				style={itemButtonStyle}
 				onClick={(e) => {
-					Meteor.call('feed.moveDown', props._id);
+					Meteor.call('feed.moveUp', _id);
 					e.preventDefault();
 					return false;
 				}}
@@ -49,7 +56,7 @@ const FeedItem = SortableElement((props) => {
 			<ArrowUpIcon
 				style={itemButtonStyle}
 				onClick={(e) => {
-					Meteor.call('feed.moveUp', props._id);
+					Meteor.call('feed.moveDown', _id);
 					e.preventDefault();
 					return false;
 				}}
@@ -57,7 +64,7 @@ const FeedItem = SortableElement((props) => {
 			<DeleteIcon
 				style={itemButtonStyle}
 				onClick={(e) => {
-					Meteor.call('feed.remove', props._id);
+					Meteor.call('feed.remove', _id);
 					e.preventDefault();
 					return false;
 				}}
@@ -160,6 +167,6 @@ class ManagerPage extends Component {
 export default createContainer(() => {
 
 	return {
-		items: FeedItems.find({}, {sort: {order: 1}}).fetch(),
+		items: FeedItems.find({}, {sort: {order: -1}}).fetch(),
 	};
 }, ManagerPage);

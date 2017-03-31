@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import Helmet from 'react-helmet';
 
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { MuiThemeProvider } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
+
+const muiTheme = getMuiTheme({
+	palette: {
+		primary1Color: "#4D8FCC",
+	},
+});
 
 export default class App extends Component {
 	constructor(props, context) {
@@ -11,7 +18,7 @@ export default class App extends Component {
 
 	render() {
 		return (
-			<MuiThemeProvider>
+			<MuiThemeProvider muiTheme={muiTheme}>
 				<Paper
 					className='app'
 					zDepth={2}

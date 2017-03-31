@@ -92,4 +92,13 @@ Meteor.methods({
 			});
 		}
 	},
+	'feed.edit'(_id,text) {
+		check(_id, String);
+		check(text, String);
+		// TODO: Check if logged in
+
+		FeedItems.update(_id, {
+			$set: { text: text }
+		});
+	}
 });
