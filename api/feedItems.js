@@ -15,7 +15,7 @@ Meteor.methods({
 		let maxOrder = 0;
 		let maxItem = FeedItems.findOne({}, {
 			sort: {
-				order: 1
+				order: -1
 			},
 			limit: 1
 		});
@@ -53,7 +53,7 @@ Meteor.methods({
 			order: {$lt: currentOrder}
 		}, {
 			sort: {
-				order: 1
+				order: -1
 			},
 			limit: 1
 		});
@@ -77,7 +77,7 @@ Meteor.methods({
 			order: {$gt: currentOrder}
 		}, {
 			sort: {
-				order: -1
+				order: 1
 			},
 			limit: 1
 		});
