@@ -10,38 +10,73 @@ import SvgIcon from 'material-ui/SvgIcon';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import DragHandleIcon from 'material-ui/svg-icons/editor/drag-handle';
+import ArrowDownIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
+import ArrowUpIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 
 import {SortableContainer, SortableElement, SortableHandle, arrayMove} from 'react-sortable-hoc';
 
 import FeedItems from '/api/feedItems.js';
 
-const DragHandle = SortableHandle(() => (
-	<DragHandleIcon />
-));
+// const DragHandle = SortableHandle(() => (
+// 	<DragHandleIcon />
+// ));
 
-const FeedItem = SortableElement(({key, text, enabled}) => {
+const itemButtonStyle = {
+	margin: '0 8px',
+};
+const FeedItem = SortableElement((props) => {
+	console.log('FeedItem', props);
 	return (
-		<ListItem
-			leftCheckbox={<Checkbox
-				defaultChecked={enabled}
-				onChange={(e) => {
-					console.log("Toggling checkbox:", e, e.target);
+	<ListItem
+		leftCheckbox={<Checkbox
+			defaultChecked={props.enabled}
+			onCheck={(e,c) => {
+				console.log("Toggling checkbox:", e, e.target, c);
+				Meteor.call('feed.setEnabled', props._id, c);
+			}}
+		/>}
+	>
+		<div style={{display: 'flex', flexDirection: 'row'}}>
+			<span style={{flex: 1}}>{props.text}</span>
+			<ArrowDownIcon
+				style={itemButtonStyle}
+				onClick={(e) => {
+					Meteor.call('feed.moveDown', props._id);
+					e.preventDefault();
+					return false;
 				}}
-			/>}
-			rightIcon={<DragHandleIcon className="draghandle" />}
-			primaryText={text}
-		/>
-	);
-});
+			/>
+			<ArrowUpIcon
+				style={itemButtonStyle}
+				onClick={(e) => {
+					Meteor.call('feed.moveUp', props._id);
+					e.preventDefault();
+					return false;
+				}}
+			/>
+			<DeleteIcon
+				style={itemButtonStyle}
+				onClick={(e) => {
+					Meteor.call('feed.remove', props._id);
+					e.preventDefault();
+					return false;
+				}}
+			/>
+		</div>
+	</ListItem>
+)});
 
 const SortableFeedList = SortableContainer(({items}) => (
 	<List>
-		{items.forEach((item) => {
-			console.log("Rendering item:", item);
-			return (
-				<FeedItem index={item.order} key={item._id} text={item.text} enabled={item.enabled} />
-			);
-		})}
+		{items.map((item) => (
+			<FeedItem
+				index={item.order}
+				key={item._id}
+				_id={item._id}
+				text={item.text}
+				enabled={item.enabled}
+			/>
+		))}
 	</List>
 ));
 
@@ -60,8 +95,9 @@ class ManagerPage extends Component {
 	}
 
 	onSortEnd(props) {
-		let items = arrayMove(this.state.items, props.oldIndex, props.newIndex);
-		this.updateItems(items);
+		console.log("Reorder:", props.oldIndex, props.newIndex, props);
+		// let items = arrayMove(this.state.items, props.oldIndex, props.newIndex);
+		// this.updateItems(items);
 	}
 
 	shouldCancelStart(e) {
@@ -96,6 +132,8 @@ class ManagerPage extends Component {
 	}
 
 	render() {
+		let items = this.props.items;
+
 		return (
 			<div>
 				<TextField
@@ -103,15 +141,13 @@ class ManagerPage extends Component {
 					floatingLabelText="Add ticker item"
 					onKeyPress={(e) => {
 						if (e.key === 'Enter') {
-							console.log('Pressed enter on', e.target.value);
 							this.addItem(e.target.value);
 							e.target.value = "";
 						}
-						console.log("Key pressed:", e.key);
 					}}
 				/>
 				{<SortableFeedList
-					items={this.props.items}
+					items={items}
 					lockAxis='y'
 					onSortEnd={(props) => { this.onSortEnd(props) }}
 					shouldCancelStart={this.shouldCancelStart}

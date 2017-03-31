@@ -6,17 +6,22 @@ export default FeedItems = new Mongo.Collection('feed');
 
 Meteor.methods({
 	'feed.insert'(text) {
+		if (!text) return;
+
 		check(text, String);
 		// TODO: Check if logged in
 
-		let maxOrder = FeedItems.find({}, {
+		let items = FeedItems.find({});
+		let maxOrder = 0;
+		let maxItem = FeedItems.findOne({}, {
 			sort: {
 				order: 1
 			},
-			fields: ['order'],
 			limit: 1
 		});
-		if (maxOrder === undefined) maxOrder = 0;
+		if (maxItem) maxOrder = maxItem.order;
+
+		console.log("Max Order found:", maxOrder);
 
 		FeedItems.insert({
 			text,
@@ -25,13 +30,13 @@ Meteor.methods({
 		});
 	},
 	'feed.remove'(_id) {
-		check(_id, Number);
+		check(_id, String);
 		// TODO: Check if logged in
 
 		FeedItems.remove(_id);
 	},
 	'feed.setEnabled'(_id,enabled) {
-		check(_id, Number);
+		check(_id, String);
 		check(enabled, Boolean);
 		// TODO: Check if logged in
 
@@ -39,11 +44,52 @@ Meteor.methods({
 			$set: { enabled: enabled },
 		});
 	},
-	'feed.swap'(_id1,_id2) {
-		check(_id1, Number);
-		check(_id2, Number);
+	'feed.moveUp'(_id) {
+		check(_id, String);
 		// TODO: Check if logged in
 
-		// TODO
+		let currentOrder = FeedItems.findOne(_id).order;
+		let swapWith = FeedItems.findOne({
+			order: {$lt: currentOrder}
+		}, {
+			sort: {
+				order: 1
+			},
+			limit: 1
+		});
+
+		console.log('Swapping:', _id, currentOrder, 'with', swapWith);
+		if (swapWith) {
+			FeedItems.update(_id, {
+				$set: { order: swapWith.order }
+			});
+			FeedItems.update(swapWith._id, {
+				$set: { order: currentOrder }
+			});
+		}
+	},
+	'feed.moveDown'(_id) {
+		check(_id, String);
+		// TODO: Check if logged in
+
+		let currentOrder = FeedItems.findOne(_id).order;
+		let swapWith = FeedItems.findOne({
+			order: {$gt: currentOrder}
+		}, {
+			sort: {
+				order: -1
+			},
+			limit: 1
+		});
+
+		console.log('Swapping:', _id, currentOrder, 'with', swapWith);
+		if (swapWith) {
+			FeedItems.update(_id, {
+				$set: { order: swapWith.order }
+			});
+			FeedItems.update(swapWith._id, {
+				$set: { order: currentOrder }
+			});
+		}
 	},
 });
