@@ -11,7 +11,7 @@ const muiTheme = getMuiTheme({
 	},
 });
 
-export default class App extends Component {
+export default class Page extends Component {
 	constructor(props, context) {
 		super(props, context);
 	}

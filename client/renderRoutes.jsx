@@ -1,7 +1,7 @@
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 
-import App from '/client/App.jsx';
+import Page from '/client/Page.jsx';
 
 import LoginPage from '/client/Login.jsx';
 import TickerPage from '/client/Ticker.jsx';
@@ -12,9 +12,9 @@ console.log("imported:", browserHistory);
 
 export default renderRoutes = () => (
 	<Router history={browserHistory}>
-		<Route component={App}>
+		<Route path="/" component={TickerPage} />
+		<Route component={Page}>
 			<Route path="/login" component={LoginPage} />
-			<Route path="/" component={TickerPage} />
 			<Route component={AuthenticatedContainer}>
 				<Route path="/manage" component={ManagerPage} />
 			</Route>
